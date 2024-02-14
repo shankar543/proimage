@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Beautification</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+
+        #imageContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #uploadedImage {
+            width: 100%;
+            height: auto;
+            filter: contrast(150%);
+            cursor: pointer;
+        }
+
+        #downloadIcon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <input type="file" id="fileInput" class="form-control mb-3" accept="image/*">
+        <div id="imageContainer">
+            <img id="uploadedImage" src="#" alt="Uploaded Image">
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const fileInput = document.getElementById('fileInput');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const imageContainer = document.getElementById('imageContainer');
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.onload = function () {
+                        applyEffects();
+                    };
+                }
+
+                reader.readAsDataURL(file);
+            }
+
+            function applyEffects() {
+                // Reset styles
+                uploadedImage.style.filter = 'contrast(150%)';
+            }
+
+            uploadedImage.addEventListener('dblclick', function () {
+                const rect = imageContainer.getBoundingClientRect();
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const scaleFactor = window.devicePixelRatio;
+
+                canvas.width = rect.width * scaleFactor;
+                canvas.height = rect.height * scaleFactor;
+
+                ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+
+                const dataURL = canvas.toDataURL();
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = 'beautified_image.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+    </script>
+</body>
+
+</html>
